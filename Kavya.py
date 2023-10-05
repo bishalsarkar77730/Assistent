@@ -1,4 +1,5 @@
 from Speech_to_text import hindi_to_english
+import speech_recognition as sr
 import pyttsx3
 import datetime
 
@@ -17,21 +18,43 @@ def speak(audio):
 def wishme():
     hour = int(datetime.datetime.now().hour)
     if 0 <= hour < 12:
-        speak("Good Morning, Master िशाल")
+        speak("Good Morning, बिशाल जी")
 
     elif 12 <= hour < 18:
-        speak("Good Afternoon, Master िशाल")
+        speak("Good Afternoon, बिशाल जी")
 
     else:
-        speak("Good Evening, Master िशाल")
+        speak("Good Evening, बिशाल जी")
 
-    speak("काव्या ऑनलाइन है. मैं आपकी कैसे मदद कर शक्ति हूं")
+    speak("काव्या ऑनलाइन है! मैं आपकी कैसे मदद कर शक्ति हूं")
 
 
 # wishme()
 
-# trigger_words = ["काव्या", "कव्या", "काव्य", "सुनो", "काव्या सुनो", "क्या सुनो"]
+trigger_words = ["काव्या", "कव्या", "काव्य",
+                 "सुनो", "काव्या सुनो", "क्या सुनो", "काव्य हेलो", "काव्य सुनो"]
+# while True:
+#     translation, back_translation = hindi_to_english()
+#     speak(translation)
+#     speak(back_translation)
+
+recognizer = sr.Recognizer()
+
 while True:
-    translation, back_translation = hindi_to_english()
-    speak(translation)
-    speak(back_translation)
+    with sr.Microphone() as source:
+        speak("मैं सुन रही हूं सर...")
+        audio = recognizer.listen(source)
+
+    try:
+        recognized_text = recognizer.recognize_google(audio, language="hi-IN")
+        print("You said: " + recognized_text)
+
+        if any(word in recognized_text for word in trigger_words):
+            translation, back_translation = hindi_to_english()
+            speak(translation)
+            speak(back_translation)
+
+    except sr.UnknownValueError:
+        pass
+    except sr.RequestError:
+        speak("आपने जो कहा वह मुझे समझ नहीं आया !")
